@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:employee-management;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+app:
+  security:
+    enabled: false
+    csrf-enabled: false
+    jwt-secret: test-secret-that-is-long-enough-123456

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Departments')}"></head>
+<body>
+<div th:replace="~{fragments/navigation :: navigation}"></div>
+<main class="mx-auto max-w-7xl px-6 py-10">
+    <div class="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div><p class="text-sm font-semibold uppercase tracking-wider text-indigo-600">Organization</p><h1 class="mt-2 text-3xl font-bold text-slate-900">Departments</h1><p class="mt-2 text-slate-500">Keep teams grouped and easy to discover.</p></div>
+        <form th:action="@{/departments}" method="post" class="flex gap-2">
+            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <input name="name" th:value="${name}" type="text" placeholder="New department" required class="rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100">
+            <button class="rounded-lg bg-indigo-600 px-4 py-2.5 font-semibold text-white hover:bg-indigo-700">Add</button>
+        </form>
+    </div>
+    <p th:if="${error}" class="mb-4 rounded-lg bg-rose-50 px-4 py-3 text-sm text-rose-700" th:text="${error}"></p>
+    <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <table class="min-w-full divide-y divide-slate-200 text-left">
+            <thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500"><tr><th class="px-6 py-4">ID</th><th class="px-6 py-4">Department</th></tr></thead>
+            <tbody class="divide-y divide-slate-100">
+            <tr th:each="department : ${departments}" class="hover:bg-slate-50"><td class="px-6 py-4 text-sm text-slate-500" th:text="${department.id}"></td><td class="px-6 py-4 font-medium text-slate-900" th:text="${department.name}"></td></tr>
+            <tr th:if="${#lists.isEmpty(departments)}"><td colspan="2" class="px-6 py-12 text-center text-slate-500">No departments yet.</td></tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,70 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '4.1.1'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.learning'
+version = '0.0.1-SNAPSHOT'
+description = 'employee-management'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'com.github.ben-manes.caffeine:caffeine'
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+    runtimeOnly 'org.postgresql:postgresql'
+    testRuntimeOnly 'com.h2database:h2'
+    testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-thymeleaf-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+tasks.register('runLocal', Exec) {
+    environment 'ENV_FILE_SUFFIX', '.local'
+    commandLine 'docker', 'compose', '--env-file', ".env${'.local'}", 'up', '-d'
+}
+
+tasks.register('runDevelop', Exec) {
+    environment 'ENV_FILE_SUFFIX', '.develop'
+    commandLine 'docker', 'compose', '--env-file', ".env${'.develop'}", 'up', '-d'
+}
+
+tasks.register('runStaging', Exec) {
+    environment 'ENV_FILE_SUFFIX', '.staging'
+    commandLine 'docker', 'compose', '--env-file', ".env${'.staging'}", 'up', '-d'
+}
+
+tasks.register('runProduction', Exec) {
+    environment 'ENV_FILE_SUFFIX', '.production'
+    commandLine 'docker', 'compose', '--env-file', ".env${'.production'}", 'up', '-d'
+}
+
+tasks.register('devDown', Exec) {
+    environment 'ENV_FILE_SUFFIX', '.local'
+    commandLine 'docker', 'compose', '--env-file', ".env${'.local'}", 'down'
+}

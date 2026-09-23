@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: employee-management
+  config:
+    import: optional:file:.env${ENV_FILE_SUFFIX:-.local}[.properties]
+  profiles:
+    default: dev
+server:
+  port: ${APP_PORT:8080}
+app:
+  security:
+    enabled: ${APP_SECURITY_ENABLED:true}
+    csrf-enabled: ${APP_SECURITY_CSRF_ENABLED:true}
+    jwt-expiration: ${JWT_EXPIRATION:PT1H}
+logging:
+  level:
+    com.learning.employeemanagement: INFO
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always

@@ -1,0 +1,41 @@
+services:
+  postgres:
+    image: 'postgres:16-alpine'
+    env_file:
+      - .env${ENV_FILE_SUFFIX:-.local}
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - '${DB_PORT:-5432}:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+    env_file:
+      - .env${ENV_FILE_SUFFIX:-.local}
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+    ports:
+      - '${APP_PORT:-8080}:8080'
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    ports:
+      - '${PGADMIN_PORT:-5050}:80'
+    depends_on:
+      postgres:
+        condition: service_healthy

@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Insights')}"></head>
+<body>
+<div th:replace="~{fragments/navigation :: navigation}"></div>
+<main class="mx-auto max-w-7xl px-6 py-10">
+    <div class="mb-8"><p class="text-sm font-semibold uppercase tracking-wider text-indigo-600">Overview</p><h1 class="mt-2 text-3xl font-bold text-slate-900">Employee insights</h1><p class="mt-2 text-slate-500">A quick view of how your organization is distributed.</p></div>
+    <div class="mb-6 rounded-2xl bg-slate-900 p-6 text-white shadow-sm"><p class="text-sm text-slate-400">Total employees</p><p class="mt-2 text-4xl font-bold" th:text="${statistics.totalEmployees}">0</p></div>
+    <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><table class="min-w-full divide-y divide-slate-200 text-left"><thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500"><tr><th class="px-6 py-4">Department</th><th class="px-6 py-4">Employees</th></tr></thead><tbody class="divide-y divide-slate-100"><tr th:each="item : ${statistics.employeesByDepartment}" class="hover:bg-slate-50"><td class="px-6 py-4 font-medium text-slate-900" th:text="${item.departmentName}">Department</td><td class="px-6 py-4 text-slate-600" th:text="${item.employeeCount}">0</td></tr><tr th:if="${#lists.isEmpty(statistics.employeesByDepartment)}"><td colspan="2" class="px-6 py-12 text-center text-slate-500">No data yet.</td></tr></tbody></table></section>
+</main>
+</body>
+</html>
