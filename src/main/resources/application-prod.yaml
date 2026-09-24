@@ -12,6 +12,8 @@ logging:
     com.learning.employeemanagement: INFO
 app:
   security:
+    enabled: true
+    csrf-enabled: true
     jwt-secret: ${JWT_SECRET}
     cookie-secure: true
     admin:

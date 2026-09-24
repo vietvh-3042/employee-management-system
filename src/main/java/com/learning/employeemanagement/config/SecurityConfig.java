@@ -8,6 +8,7 @@ import com.learning.employeemanagement.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -29,11 +30,28 @@ public class SecurityConfig {
     }
 
     @Bean
+    @Profile("!prod")
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
             ObjectProvider<JwtAuthenticationFilter> jwtFilterProvider,
             @Value("${app.security.enabled:true}") boolean securityEnabled,
             @Value("${app.security.csrf-enabled:true}") boolean csrfEnabled) throws Exception {
+        return buildSecurityFilterChain(http, jwtFilterProvider, securityEnabled, csrfEnabled);
+    }
+
+    @Bean
+    @Profile("prod")
+    public SecurityFilterChain productionSecurityFilterChain(
+            HttpSecurity http,
+            ObjectProvider<JwtAuthenticationFilter> jwtFilterProvider) throws Exception {
+        return buildSecurityFilterChain(http, jwtFilterProvider, true, true);
+    }
+
+    private SecurityFilterChain buildSecurityFilterChain(
+            HttpSecurity http,
+            ObjectProvider<JwtAuthenticationFilter> jwtFilterProvider,
+            boolean securityEnabled,
+            boolean csrfEnabled) throws Exception {
         http.csrf(csrf -> {
             if (csrfEnabled) {
                 csrf.ignoringRequestMatchers(ApiPaths.V1 + "/**");
@@ -80,6 +98,7 @@ public class SecurityConfig {
             AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth) {
         auth.requestMatchers(
                         HttpMethod.GET,
+                        ApiPaths.DEPARTMENTS,
                         WebPaths.DEPARTMENT_LIST,
                         WebPaths.EMPLOYEE_LIST,
                         WebPaths.EMPLOYEE_STATISTICS)

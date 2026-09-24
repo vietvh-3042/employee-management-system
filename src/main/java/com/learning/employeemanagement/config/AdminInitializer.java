@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AdminInitializer implements CommandLineRunner {
 
+    private static final int MIN_PASSWORD_LENGTH = 12;
     private static final Logger log = LoggerFactory.getLogger(AdminInitializer.class);
 
     private final UserRepository userRepository;
@@ -38,6 +39,8 @@ public class AdminInitializer implements CommandLineRunner {
             return;
         }
 
+        validatePassword(password);
+
         String normalizedUsername = username.trim();
         if (userRepository.existsByUsername(normalizedUsername)) {
             log.info("Admin user already exists: username={}", normalizedUsername);
@@ -49,5 +52,16 @@ public class AdminInitializer implements CommandLineRunner {
                 passwordEncoder.encode(password),
                 Role.ADMIN));
         log.info("Admin user created: username={}", normalizedUsername);
+    }
+
+    private void validatePassword(String candidate) {
+        if (candidate.length() < MIN_PASSWORD_LENGTH
+                || !candidate.matches(".*[A-Z].*")
+                || !candidate.matches(".*[a-z].*")
+                || !candidate.matches(".*\\d.*")
+                || !candidate.matches(".*[^A-Za-z0-9].*")) {
+            throw new IllegalStateException(
+                    "ADMIN_PASSWORD must be at least 12 characters and contain upper, lower, digit, and special character");
+        }
     }
 }

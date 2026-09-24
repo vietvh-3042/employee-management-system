@@ -10,6 +10,7 @@ import com.learning.employeemanagement.repository.EmployeeRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
@@ -93,11 +94,11 @@ public class EmployeeService {
     }
 
     @CacheEvict(cacheNames = {CacheNames.EMPLOYEE_COUNT, CacheNames.EMPLOYEE_STATISTICS}, allEntries = true)
+    @Transactional
     public void delete(Long id) {
-        if (!employeeRepository.existsById(id)) {
+        if (employeeRepository.deleteByIdIfPresent(id) == 0) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found");
         }
-        employeeRepository.deleteById(id);
         log.info("Deleted employee id={}", id);
     }
 
