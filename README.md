@@ -90,7 +90,7 @@ Employee create and update trim name, email, username, and department name befor
 6. The filter prioritizes the Authorization header, then falls back to the cookie.
 7. Invalid tokens are treated as unauthenticated requests and are rejected by protected routes.
 
-JWT secrets must contain at least 32 characters. The default token lifetime is PT1H. Production enables secure cookies; local development keeps them usable over HTTP.
+JWT secrets must contain at least 32 characters and are required in every profile; there is no hardcoded fallback. The default token lifetime is PT1H. Production enables secure cookies; local development keeps them usable over HTTP.
 
 ### Access policy
 
@@ -104,7 +104,7 @@ JWT secrets must contain at least 32 characters. The default token lifetime is P
 | Create department and open add-employee page | No | No | Yes |
 | Actuator endpoints other than health | No | No | Yes |
 
-When app.security.enabled=false, all routes are permitted. CSRF is enabled by default for browser forms; versioned API routes are excluded so bearer-token clients can call them. Browser forms include the CSRF token automatically.
+In the dev profile, `APP_SECURITY_ENABLED=false` may be used for local troubleshooting and permits all routes. Production always uses authentication and CSRF protection; its security policy cannot be disabled through environment flags. CSRF is enabled by default for browser forms; versioned API routes are excluded so bearer-token clients can call them. Browser forms include the CSRF token automatically. Actuator health is public but returns status only; other actuator endpoints require ADMIN.
 
 ## Endpoints
 
@@ -167,12 +167,14 @@ Before deploying to an existing production database, apply unique constraints fo
 | APP_PORT | HTTP port | 8080 |
 | JWT_SECRET | JWT signing key | At least 32 characters; required in production |
 | JWT_EXPIRATION | JWT lifetime | PT1H |
-| APP_SECURITY_ENABLED | Enable or disable route security | true |
-| APP_SECURITY_CSRF_ENABLED | Enable browser CSRF protection | true |
-| ADMIN_USERNAME, ADMIN_PASSWORD | Optional first admin account | Created once at startup |
+| APP_SECURITY_ENABLED | Enable or disable route security in dev | true; ignored in prod |
+| APP_SECURITY_CSRF_ENABLED | Enable browser CSRF protection in dev | true; ignored in prod |
+| ADMIN_USERNAME, ADMIN_PASSWORD | Optional first admin account | Created once at startup; password requires 12+ chars with upper/lower/digit/special |
 | PGADMIN_PORT, PGADMIN_EMAIL, PGADMIN_PASSWORD | pgAdmin access | Used by Docker Compose |
 
 The application imports an optional environment file based on ENV_FILE_SUFFIX. The local Gradle task uses the local environment file; development, staging, and production tasks use their corresponding suffixes.
+
+Never commit environment files or reuse exposed credentials. Rotate any database, pgAdmin, admin, or JWT credentials that have ever been committed, then purge them from repository history using the repository's approved history-rewrite process.
 
 ### Profiles and schema strategy
 

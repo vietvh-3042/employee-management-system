@@ -12,6 +12,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -19,6 +21,8 @@ import java.util.Arrays;
 @Component
 @ConditionalOnBean(JwtService.class)
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     private final JwtService jwtService;
     private final DatabaseUserDetailsService userDetailsService;
@@ -50,8 +54,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
-        } catch (RuntimeException ignored) {
-            // Invalid tokens are treated as unauthenticated requests.
+        } catch (RuntimeException exception) {
+            log.debug("JWT authentication failed for request path={}", request.getRequestURI(), exception);
         }
         filterChain.doFilter(request, response);
     }

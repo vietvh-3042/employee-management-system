@@ -11,6 +11,7 @@ import com.learning.employeemanagement.repository.EmployeeRepository;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -101,5 +102,27 @@ class EmployeeControllerTests {
                         .content("not-json"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Request body must be valid JSON"));
+    }
+
+    @Test
+    void returnsBadRequestForNonNumericEmployeeId() throws Exception {
+        mockMvc.perform(get("/api/v1/employees/not-a-number"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message")
+                        .value("Request parameter or path variable has an invalid type"));
+    }
+
+    @Test
+    void deletingAnEmployeeTwiceReturnsNotFoundOnSecondRequest() throws Exception {
+        String location = mockMvc.perform(post("/api/v1/employees")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Delete Me\",\"email\":\"delete@example.com\"}"))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getHeader("Location");
+
+        mockMvc.perform(delete(location))
+                .andExpect(status().isNoContent());
+        mockMvc.perform(delete(location))
+                .andExpect(status().isNotFound());
     }
 }
